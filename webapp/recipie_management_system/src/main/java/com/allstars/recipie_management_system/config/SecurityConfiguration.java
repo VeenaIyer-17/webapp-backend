@@ -41,38 +41,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/v1/user").permitAll()
                     .antMatchers( HttpMethod.GET,"/v1/recipies").permitAll()
                     .antMatchers( HttpMethod.GET,"/v1/recipie/{id}").permitAll()
+                    .antMatchers( HttpMethod.GET, "/v1/allrecipes").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .httpBasic()
                     .and()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-           /* http.authorizeRequests()
-                    .antMatchers(HttpMethod.GET, "v1/user/self").fullyAuthenticated()
-                    .anyRequest().permitAll();
-            http.authorizeRequests()
-                    .antMatchers(HttpMethod.PUT, "v1/user/self").fullyAuthenticated()
-                    .anyRequest().permitAll();
-            http.authorizeRequests()
-                    .antMatchers(HttpMethod.POST, "v1/recipie/").fullyAuthenticated()
-                    .anyRequest().permitAll();
-            http.authorizeRequests()
-                    .antMatchers(HttpMethod.DELETE, "/v1/recipie/{id}").fullyAuthenticated()
-                    .anyRequest().permitAll();*/
-
-            /*http.csrf().disable()
-                    .authorizeRequests()
-                    .antMatchers(HttpMethod.POST, "v1/user").permitAll()
-                    .antMatchers(HttpMethod.GET, "v1/recipie/{id}").permitAll()
-                    .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-
-            http.httpBasic().authenticationEntryPoint(basicAuthenticationEntryPoint).and()
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-*/
-            //http.authorizeRequests().antMatchers(HttpMethod.POST, "v1/user").permitAll();
-            //http.authorizeRequests().antMatchers(HttpMethod.GET, "v1/recipie/{id}").permitAll();
 
         } catch(Exception exc) {
 
