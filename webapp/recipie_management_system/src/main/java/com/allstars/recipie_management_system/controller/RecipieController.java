@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class RecipieController {
@@ -112,6 +114,18 @@ public class RecipieController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
+    public List<Recipie> retrieveAllRecipes() {
+        List<Recipie> recipieList = new ArrayList<>();
+        for (Recipie recipie : recipieService.getAllRecipes()) {
+            recipieList.add(recipie);
+        }
+        return recipieList;
+    }
+
+    @RequestMapping(value= "/v1/allrecipes", method = RequestMethod.GET)
+    public ResponseEntity<Object> getAllRecipes() {
+        return ResponseEntity.ok(retrieveAllRecipes());
+    }
 
     public String[] decryptAuthenticationToken(String token) throws UnsupportedEncodingException {
         String[] basicAuthToken = token.split(" ");

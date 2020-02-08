@@ -6,7 +6,6 @@
 | --- | --- | --- |
 | Ravi Kiran | 001491808 | lnu.ra@husky.neu.edu |
 | Veena Vasudevan Iyer | 001447061 | iyer.v@husky.neu.edu |
-| | | |
 
 ## Technology Stack
 
@@ -19,8 +18,8 @@ A user can create a recipe, delete & update only authored recipes. Anyone can fe
 ## Build Instructions
 Pre-req : Need tool to run REST endpoints like POSTMAN, MariaDB , IDE, Ansible, KOPS
     * Bring up the infrastructure using code and instructions at https://github.com/advancecloud7374/Infrastructure
-    *
-    * Setting up Jenkins:
+    
+    * Setting up Jenkins *
     * Open your domain where Jenkins is hosted
     * Login to Jenkins console using the steps mentioned on the console
     * Download the plugins. Make sure github and docker plugins are installed
@@ -35,14 +34,16 @@ Pre-req : Need tool to run REST endpoints like POSTMAN, MariaDB , IDE, Ansible, 
     * Now add the environment variables:
     * - Add Docker credentials {DOCKER_USER} and {DOCKER_PASS} for pushing the image tto docker hub
     * - Add {BACKEND_IMAGE_NAME} for the docker image name
-    *
-    * Setting up github:
+    
+
+    * Setting up github *
     * Open the github repository and add the webhook for the Jenkins server under settings>webhooks option
     * Provide the payload url(url where jenkins is hosted) and append /github-webhook/ in the end. Example: jenkins.kiranravi.me
     * Content type: application/json
     * Save the Webhook
-    *
-    * Triggering the job:
+    
+
+    * Triggering the job *
     * Push the code to the repository.
     * This should trigger the job in Jenkins.
     * Once completed, a new docker image should be available at docker hub.
