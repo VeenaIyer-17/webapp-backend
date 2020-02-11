@@ -19,7 +19,7 @@ node {
         stage('Pushing image') {
             script {
                     docker.withRegistry('', "${env.docker_creds}" ) {
-                    docker_image.push("${GIT_COMMIT}")
+                    docker_image.push("${commit_id}")
                     docker_image.push("latest")
                 }
             }
