@@ -1,36 +1,27 @@
-pipeline{
- agent any
-  stages{
-    stage('Git Clone') {
-      steps {
-          checkout scm
-      }
+node {
+    def docker_image
+    def commit_id
+        stage('Clone Repository') {
+            checkout scm
+        }
+        stage('Build') {
+            sh 'mvn -B -DskipTests clean package'
+        }
+        stage('Test') {
+            sh 'mvn test'
+        }
+        stage('Building image') {
+            script {
+                commit_id = sh(returnStdout: true, script: 'git rev-parse HEAD')
+                docker_image = docker.build("${env.registry}")
+            }
+        }
+        stage('Pushing image') {
+            script {
+                    docker.withRegistry('', "${env.docker_creds}" ) {
+                    docker_image.push("${GIT_COMMIT}")
+                    docker_image.push("latest")
+                }
+            }
+        }
     }
-  
-    stage('Build package') {
-      steps {
-	  sh 'cd /var/lib/jenkins/workspace/backendPipeline/webapp/recipie_management_system/'
-	  sh 'pwd'
-	  dir('webapp/recipie_management_system/'){
-            sh 'mvn clean install'
-          } 
-      }
-    }
-    stage('Build docker image') {
-      steps {
-	  dir('webapp/recipie_management_system/'){
-	  sh '''
-          env && docker build -t ${BACKEND_IMAGE_NAME}:${GIT_COMMIT} .
-          '''}
-      }
-    }
-	stage('Push image') {
-      steps {
-          sh '''
-          docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-          docker push ${BACKEND_IMAGE_NAME}:${GIT_COMMIT}
-          '''
-      }
-    }
-  }
-}
