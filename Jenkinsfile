@@ -6,21 +6,17 @@ pipeline{
           checkout scm
       }
     }
-  
+
     stage('Build package') {
       steps {
-	  sh 'pwd'
-	  dir('webapp/recipie_management_system/'){
             sh 'mvn clean install'
-          } 
       }
     }
     stage('Build docker image') {
       steps {
-	  dir('webapp/recipie_management_system/'){
 	  sh '''
           env && docker build -t ${BACKEND_IMAGE_NAME}:${GIT_COMMIT} .
-          '''}
+          '''
       }
     }
 	stage('Push image') {
