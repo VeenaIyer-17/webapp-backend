@@ -1,27 +1,31 @@
-node {
-    def docker_image
-    def commit_id
-        stage('Clone Repository') {
-            checkout scm
-        }
-        stage('Build') {
-            sh 'mvn -B -DskipTests clean package'
-        }
-        stage('Test') {
-            sh 'mvn test'
-        }
-        stage('Building image') {
-            script {
-                commit_id = sh(returnStdout: true, script: 'git rev-parse HEAD')
-                docker_image = docker.build("${env.registry}")
-            }
-        }
-        stage('Pushing image') {
-            script {
-                    docker.withRegistry('', "${env.docker_creds}" ) {
-                    docker_image.push("${commit_id}")
-                    docker_image.push("latest")
-                }
-            }
-        }
+pipeline{
+ agent any
+  stages{
+    stage('Git Clone') {
+      steps {
+          checkout scm
+      }
     }
+
+    stage('Build package') {
+      steps {
+            sh 'mvn clean install'
+      }
+    }
+    stage('Build docker image') {
+      steps {
+	  sh '''
+          env && docker build -t ${BACKEND_IMAGE_NAME}:${GIT_COMMIT} .
+          '''
+      }
+    }
+	stage('Push image') {
+      steps {
+          sh '''
+          docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+          docker push ${BACKEND_IMAGE_NAME}:${GIT_COMMIT}
+          '''
+      }
+    }
+  }
+}

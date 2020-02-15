@@ -8,7 +8,7 @@ ARG JAR_FILE=target/ROOT.war
 ADD ${JAR_FILE} recipe-demo.jar
 # Run the jar file
 ENTRYPOINT java -jar \
-    -Dspring.datasource.domain=${MYSQL_HOST} \
+    -Dspring.datasource.url=${MYSQL_HOST} \
     -Dspring.datasource.username=${MYSQL_USER} \
     -Dspring.datasource.password=${MYSQL_PASSWORD} \
     /recipe-demo.jar
