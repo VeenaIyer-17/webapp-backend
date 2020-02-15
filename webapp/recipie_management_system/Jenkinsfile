@@ -9,7 +9,6 @@ pipeline{
   
     stage('Build package') {
       steps {
-	  sh 'cd /var/lib/jenkins/workspace/backendPipeline/webapp/recipie_management_system/'
 	  sh 'pwd'
 	  dir('webapp/recipie_management_system/'){
             sh 'mvn clean install'
