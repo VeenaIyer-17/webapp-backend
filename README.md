@@ -48,4 +48,3 @@ Pre-req : Need tool to run REST endpoints like POSTMAN, MariaDB , IDE, Ansible, 
     * This should trigger the job in Jenkins.
     * Once completed, a new docker image should be available at docker hub.
     
-    #TA DEMO
