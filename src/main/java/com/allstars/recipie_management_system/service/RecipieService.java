@@ -124,4 +124,8 @@ public class RecipieService {
             return null;
         }
     }
+    public boolean isRecipeImagePresent( Recipie recipie) {
+        if(recipie.getImage() == null) return false;
+        return true;
+    }
 }
