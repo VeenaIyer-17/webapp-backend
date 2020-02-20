@@ -16,7 +16,7 @@ public class RecipeImage {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String imageId;
-
+    @Column(columnDefinition = "LONGTEXT")
     private String url;
 
     private String md5Hash;
