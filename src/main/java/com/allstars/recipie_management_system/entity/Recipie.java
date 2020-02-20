@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @JsonIgnoreProperties(value={"user"}, allowSetters= true)
@@ -28,7 +29,7 @@ public class Recipie {
     private User user;
 
     @Column
-    private String author_id;
+    private String authorid;
 
     @Column
     private Integer cook_time_in_min;
@@ -60,9 +61,11 @@ public class Recipie {
     @JoinColumn(name="NIid")
     private NutritionInformation nutritionInformation;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private RecipeImage image;
 
-    public Recipie(Date createdts, Date updated_ts, Integer cook_time_in_min, Integer prep_time_in_min, int total_time_in_min, String title, String cuisine, Integer servings, List<String> ingredients, Set<OrderedList> steps, NutritionInformation nutritionInformation) {
-        //this.createdts = created_ts;
+    public Recipie(Date created_ts, Date updated_ts, Integer cook_time_in_min, Integer prep_time_in_min, int total_time_in_min, String title, String cuisine, Integer servings, List<String> ingredients, Set<OrderedList> steps, NutritionInformation nutritionInformation) {
+        //this.created_ts = created_ts;
         this.updated_ts = updated_ts;
         this.cook_time_in_min = cook_time_in_min;
         this.prep_time_in_min = prep_time_in_min;
@@ -87,11 +90,11 @@ public class Recipie {
     }
 
     public String getAuthor_id() {
-        return author_id;
+        return authorid;
     }
 
     public void setAuthor_id(String author_id) {
-        this.author_id = author_id;
+        this.authorid = author_id;
     }
 
     public String getRecipeId() {
@@ -106,8 +109,8 @@ public class Recipie {
         return createdts;
     }
 
-    public void setCreatedts(Date createdts) {
-        this.createdts = createdts;
+    public void setCreatedts(Date created_ts) {
+        this.createdts = created_ts;
     }
 
     public Date getUpdated_ts() {
@@ -116,7 +119,7 @@ public class Recipie {
 
     public void setUpdated_ts() {
 
-            this.updated_ts = new Date();
+        this.updated_ts = new Date();
 
     }
 
@@ -192,5 +195,12 @@ public class Recipie {
         this.nutritionInformation = nutritionInformation;
     }
 
+    public RecipeImage getImage() {
+        return image;
+    }
+
+    public void setImage(RecipeImage image) {
+        this.image = image;
+    }
 }
 
