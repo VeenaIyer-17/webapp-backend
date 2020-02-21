@@ -4,8 +4,9 @@
 
 | Name | NEU ID | Email Address |
 | --- | --- | --- |
-| Ravi Kiran | 001491808 | lnu.ra@husky.neu.edu |
-| Veena Vasudevan Iyer | 001447061 | iyer.v@husky.neu.edu |
+| Akash Katakam | 001400025 | katakam.a@husky.neu.edu |
+| Ravi Kiran    | 001491808 | lnu.ra@husky.neu.edu    |
+| Veena Iyer    | 001447061 | iyer.v@husky.neu.edu    |
 
 ## Technology Stack
 
@@ -47,5 +48,3 @@ Pre-req : Need tool to run REST endpoints like POSTMAN, MariaDB , IDE, Ansible, 
     * Push the code to the repository.
     * This should trigger the job in Jenkins.
     * Once completed, a new docker image should be available at docker hub.
-
-## TA Demo
