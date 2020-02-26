@@ -1,5 +1,8 @@
 package com.allstars.recipie_management_system.config;
 
+import com.allstars.recipie_management_system.entity.Recipie;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
@@ -15,9 +18,7 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.*;
 
 import java.time.Duration;
 
@@ -63,16 +64,24 @@ public class RedisCacheConfig extends CachingConfigurerSupport implements Cachin
     }
 
     @Bean
-    public RedisTemplate<Object, Object> redisTemplate() {
+    public RedisTemplate<Object, Object> redisTemplate(Jackson2JsonRedisSerializer<Recipie> customJackson2JsonRedisSerializer) {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
+        ObjectMapper om = new ObjectMapper();
+//        Jackson2JsonRedisSerializer<Recipie> customJackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Recipie>(Recipie.class);
+//        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+//        customJackson2JsonRedisSerializer.setObjectMapper(om);
         redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setDefaultSerializer(customJackson2JsonRedisSerializer);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(customJackson2JsonRedisSerializer);
         return redisTemplate;
     }
 
 
     @Bean
-    public RedisCacheManager redisCacheManager(LettuceConnectionFactory lettuceConnectionFactory,ObjectMapper objectMapper) {
+    public RedisCacheManager redisCacheManager(LettuceConnectionFactory lettuceConnectionFactory,Jackson2JsonRedisSerializer<Recipie> customRedisSerializer) {
 
         /**
          * If we want to use JSON Serialized with own object mapper then use the below config snippet
@@ -80,7 +89,7 @@ public class RedisCacheConfig extends CachingConfigurerSupport implements Cachin
          RedisCacheConfiguration redisCacheConfiguration =
          RedisCacheConfiguration.defaultCacheConfig().disableCachingNullValues()
          .entryTtl(Duration.ofMinutes(redisDataTTL)).serializeValuesWith(RedisSerializationContext.SerializationPair
-         .fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
+         .fromSerializer(customRedisSerializer));
 
         redisCacheConfiguration.usePrefix();
 
@@ -91,5 +100,14 @@ public class RedisCacheConfig extends CachingConfigurerSupport implements Cachin
         return redisCacheManager;
     }
 
+    @Bean
+    public Jackson2JsonRedisSerializer<Recipie> customRedisSerializer(){
+        Jackson2JsonRedisSerializer<Recipie> customJackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Recipie>(Recipie.class);
+        ObjectMapper om = new ObjectMapper();
+//        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        customJackson2JsonRedisSerializer.setObjectMapper(om);
+        return customJackson2JsonRedisSerializer;
+    }
 
 }

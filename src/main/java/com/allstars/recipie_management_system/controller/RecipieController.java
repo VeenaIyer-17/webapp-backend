@@ -72,7 +72,7 @@ public class RecipieController {
         String userDetails[] = decryptAuthenticationToken(token);
         Recipie existingRecipie = recipieService.getRecipe(recipeId);
         if (null != existingRecipie) {
-            if (existingRecipie.getUser().getEmailId().equalsIgnoreCase(userDetails[0])) {
+            if (userdao.findByUuid(existingRecipie.getAuthor_id()).equals(userdao.findByEmailId(userDetails[0]))) {
                 recipieService.deleteRecipe(recipeId);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
             }
@@ -86,7 +86,7 @@ public class RecipieController {
                                            HttpServletResponse response) throws UnsupportedEncodingException {
 
         RecipieCreationStatus recipieCreationStatus;
-
+        Recipie existingRecipe = recipieService.getRecipe(id);
         if (errors.hasErrors()) {
             recipieCreationStatus = recipieService.getRecipieCreationStatus(errors);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -95,9 +95,15 @@ public class RecipieController {
             String[] authDetails = decryptAuthenticationToken(token);
             String userEmailID = authDetails[0];
             String t_id = id;
-            return recipieService.updateRecipie(t_id, userEmailID, recipie);
+            if (existingRecipe == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
+            } else {
+                if (userdao.findByUuid(existingRecipe.getAuthor_id()).equals(userdao.findByEmailId(userEmailID))) {
+                    recipieService.updateRecipe(recipie,existingRecipe);
+                    return new ResponseEntity<Recipie>(recipie, HttpStatus.OK);
+                } else return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
+            }
         }
-
     }
 
     @GetMapping(value = "/v1/recipies")
@@ -130,9 +136,9 @@ public class RecipieController {
 
     @GetMapping(value = "/health")
     public ResponseEntity<Object> getHealthCheck() {
-        HashMap<String,String> healthObject= new HashMap<>();
-        healthObject.put("status","up");
-        return new ResponseEntity<>(healthObject,HttpStatus.OK);
+        HashMap<String, String> healthObject = new HashMap<>();
+        healthObject.put("status", "up");
+        return new ResponseEntity<>(healthObject, HttpStatus.OK);
     }
 
     public String[] decryptAuthenticationToken(String token) throws UnsupportedEncodingException {

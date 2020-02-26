@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface Userdao extends CrudRepository<User, String> {
     User findByEmailId(String emailId);
-
+    User findByUuid(String id);
     @Query("SELECT count(emailId) FROM User WHERE emailId=:emailId")
     int isEmailPresent(@Param("emailId") String emailId);
 }

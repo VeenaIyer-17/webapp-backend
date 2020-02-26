@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+/*Storing the cache in redis with ttl of 2 minutes. The key @CachePut always calls the method so it updates the cache for put and post methods where as @Cacheable only
+when it doesn't have that key-value pair */
 @Service
 public class RecipieService {
 
@@ -27,7 +29,7 @@ public class RecipieService {
         this.recipieDao = recipieDao;
     }
 
-    @Caching(put = {@CachePut(value = "recipie", key = "#recipie.recipeId")}, evict = {@CacheEvict(value = "allRecipes", allEntries = true)})
+    @CachePut(value = "recipe", key = "#recipie.recipeId")
     public Recipie SaveRecipie(Recipie recipie, User user) {
         recipie.setUser(user);
         recipie.setAuthor_id(user.getUuid());
@@ -61,14 +63,25 @@ public class RecipieService {
         return recipieCreationStatus;
     }
 
-    @Cacheable(value = "recipie", key = "#recipeId",condition="#fetchFromCache")
+    @Cacheable(value = "recipe", key = "#recipeid", unless = "#result == null")
     public Recipie getRecipe(String recipeid) {
         return recipieDao.findByRecipeid(recipeid);
     }
 
-    @Caching(evict = {@CacheEvict(value = "recipie"), @CacheEvict(value = "allRecipes", allEntries = true)})
+    @Caching(evict = {@CacheEvict(key = "#recipeId", value = "recipe")})
     public void deleteRecipe(String recipeId) {
         recipieDao.deleteById(recipeId);
+    }
+
+    @CachePut(value = "recipe", key = "#existingRecipe.recipeId")
+    public Recipie updateRecipe(Recipie updateRecipe, Recipie existingRecipe) {
+        updateRecipe.setRecipeId(existingRecipe.getRecipeId());
+        updateRecipe.setUser(existingRecipe.getUser());
+        updateRecipe.setAuthor_id(existingRecipe.getAuthor_id());
+        updateRecipe.setCreatedts(existingRecipe.getCreatedts());
+        updateRecipe.setUpdated_ts();
+        updateRecipe.setTotal_time_in_min();
+        return recipieDao.save(updateRecipe);
     }
 
     public ResponseEntity<?> updateRecipie(String id, String userEmailId, Recipie recipie) {
@@ -86,7 +99,7 @@ public class RecipieService {
                 recipie.setCreatedts(retrivedRecipie.getCreatedts());
                 recipie.setUpdated_ts();
                 recipie.setTotal_time_in_min();
-                recipieDao.save(recipie);
+                this.SaveRecipie(recipie, recipie.getUser());
                 return new ResponseEntity<Recipie>(recipie, HttpStatus.CREATED);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("");
@@ -106,7 +119,7 @@ public class RecipieService {
         }
     }
 
-    @Cacheable(value = "allRecipes",condition="#fetchFromCache")
+    @Cacheable(value = "allRecipes", condition = "#fetchFromCache")
     public List<Recipie> getAllRecipes() {
         return recipieDao.findAll();
     }
