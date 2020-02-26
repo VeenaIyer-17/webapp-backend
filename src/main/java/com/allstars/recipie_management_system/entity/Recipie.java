@@ -12,9 +12,9 @@ import java.util.Set;
 @JsonIgnoreProperties(value={"user"}, allowSetters= true)
 public class Recipie {
 
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name = "recipeid" ,columnDefinition = "CHAR(32)")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "recipeid")
     @Id
     private String recipeid;
 

@@ -1,6 +1,8 @@
 package com.allstars.recipie_management_system.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -12,8 +14,8 @@ import javax.persistence.Id;
 @JsonIgnoreProperties(value={"md5Hash"}, allowSetters= true)
 public class RecipeImage {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(columnDefinition = "CHAR(32)")
     private String imageId;
     @Column(columnDefinition = "LONGTEXT")

@@ -39,7 +39,7 @@ public class RecipieController {
         binder.setValidator(recipieValidator);
     }
 
-    @RequestMapping(value = "v1/recipie", method = RequestMethod.POST)
+    @PostMapping(value = "v1/recipie")
     public ResponseEntity<?> createRecipie(@RequestHeader("Authorization") String token, @Valid @RequestBody Recipie recipie, BindingResult errors,
                                            HttpServletResponse response) throws Exception {
         RecipieCreationStatus recipieCreationStatus;
@@ -52,11 +52,11 @@ public class RecipieController {
             String[] authDetails = decryptAuthenticationToken(token);
             User user = userdao.findByEmailId(authDetails[0]);
             Recipie newrecipie = recipieService.SaveRecipie(recipie, user);
-            return new ResponseEntity<Recipie>(newrecipie, HttpStatus.CREATED);
+            return new ResponseEntity<>(newrecipie, HttpStatus.CREATED);
         }
     }
 
-    @RequestMapping(value = "v1/recipie/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "v1/recipie/{id}")
     public ResponseEntity<Recipie> getRecipe(@PathVariable("id") String id) {
         //System.out.println(recipeId);
         //UUID recipeId = UUID.fromString(id);
@@ -67,7 +67,7 @@ public class RecipieController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    @RequestMapping(value = "/v1/recipie/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/v1/recipie/{id}")
     public ResponseEntity deleteRecipe(@PathVariable("id") String recipeId, @RequestHeader("Authorization") String token) throws UnsupportedEncodingException {
         String userDetails[] = decryptAuthenticationToken(token);
         Recipie existingRecipie = recipieService.getRecipe(recipeId);
@@ -81,7 +81,7 @@ public class RecipieController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
-    @RequestMapping(value = "v1/recipie/{recipieid}", method = RequestMethod.PUT)
+    @PutMapping(value = "v1/recipie/{recipieid}")
     public ResponseEntity<?> updateRecipie(@PathVariable("recipieid") String id, @RequestHeader("Authorization") String token, @Valid @RequestBody Recipie recipie, BindingResult errors,
                                            HttpServletResponse response) throws UnsupportedEncodingException {
 
@@ -100,7 +100,7 @@ public class RecipieController {
 
     }
 
-    @RequestMapping(value = "/v1/recipies", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/recipies")
     public ResponseEntity<?> getLatestRecipe() {
         long startTime = System.currentTimeMillis();
         Recipie recipe = null;
@@ -123,12 +123,12 @@ public class RecipieController {
         return recipieList;
     }
 
-    @RequestMapping(value = "/v1/allrecipes", method = RequestMethod.GET)
+    @GetMapping(value = "/v1/allrecipes")
     public ResponseEntity<Object> getAllRecipes() {
         return ResponseEntity.ok(retrieveAllRecipes());
     }
 
-    @RequestMapping(value = "/health", method = RequestMethod.GET)
+    @GetMapping(value = "/health")
     public ResponseEntity<Object> getHealthCheck() {
         HashMap<String,String> healthObject= new HashMap<>();
         healthObject.put("status","up");
