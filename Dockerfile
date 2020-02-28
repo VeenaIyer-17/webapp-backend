@@ -12,4 +12,6 @@ ENTRYPOINT java -jar \
     -Dspring.datasource.url=${MYSQL_HOST} \
     -Dspring.datasource.username=${MYSQL_USER} \
     -Dspring.datasource.password=${MYSQL_PASSWORD} \
+    -Dspring.redis.host=${REDIS_HOST} \
+    -Dspring.redis.password=${REDIS_PASSWORD} \
     /recipe-demo.jar

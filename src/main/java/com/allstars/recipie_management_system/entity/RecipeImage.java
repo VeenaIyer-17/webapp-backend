@@ -14,8 +14,8 @@ import javax.persistence.Id;
 @JsonIgnoreProperties(value={"md5Hash"}, allowSetters= true)
 public class RecipeImage {
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String imageId;
     @Column(columnDefinition = "LONGTEXT")
