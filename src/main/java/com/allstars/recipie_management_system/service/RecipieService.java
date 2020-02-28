@@ -119,7 +119,6 @@ public class RecipieService {
         }
     }
 
-    @Cacheable(value = "allRecipes", condition = "#fetchFromCache")
     public List<Recipie> getAllRecipes() {
         return recipieDao.findAll();
     }

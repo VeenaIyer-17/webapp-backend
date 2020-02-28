@@ -79,7 +79,7 @@ public class RecipeImageController {
                 String photoNewName = image.getOriginalFilename();
                 recipeImage = recipeImageService.uploadImage(image, photoNewName,recipie.getRecipeId(),recipeImage);
                 recipie.setImage(recipeImage);
-                Recipie rec = recipieDao.save(recipie);
+                Recipie rec = recipieService.updateRecipe(recipie,recipie);
                 RecipeImage recImg = rec.getImage();
                 logger.info("Image Posted succcessfully");
                 return ResponseEntity.status(HttpStatus.CREATED).body(recImg);
@@ -117,6 +117,7 @@ public class RecipeImageController {
                                 recipeImageService.deleteImage(recipeImage,recipie.getRecipeId());
                                 recipie.setImage(null);
                                 recipeImageDao.delete(recipeImage);
+                                recipieService.updateRecipe(recipie,recipie);
                                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
                             }
                             else {
