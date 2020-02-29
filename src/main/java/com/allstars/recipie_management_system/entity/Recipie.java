@@ -14,7 +14,7 @@ public class Recipie {
 
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name = "recipeid" ,columnDefinition = "CHAR(32)")
+    @Column(name = "recipeid", columnDefinition = "CHAR(32)")
     @Id
     private String recipeid;
 

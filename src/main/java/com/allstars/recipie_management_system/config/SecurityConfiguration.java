@@ -56,6 +56,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
                     .antMatchers(HttpMethod.GET, "/v1/recipie/{id}").permitAll()
                     .antMatchers(HttpMethod.GET, "/v1/allrecipes").permitAll()
                     .antMatchers(HttpMethod.GET, "/health").permitAll()
+                    .antMatchers(HttpMethod.GET,"/livenessCheck").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .httpBasic()
