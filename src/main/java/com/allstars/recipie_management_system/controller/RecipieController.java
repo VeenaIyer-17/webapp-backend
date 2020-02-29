@@ -2,12 +2,18 @@ package com.allstars.recipie_management_system.controller;
 
 
 import com.allstars.recipie_management_system.dao.Userdao;
+import com.allstars.recipie_management_system.entity.NutritionInformation;
+import com.allstars.recipie_management_system.entity.OrderedList;
 import com.allstars.recipie_management_system.entity.Recipie;
 import com.allstars.recipie_management_system.entity.User;
 import com.allstars.recipie_management_system.errors.RecipieCreationStatus;
 import com.allstars.recipie_management_system.service.RecipieService;
 import com.allstars.recipie_management_system.validators.RecipieValidator;
+import org.hibernate.annotations.Synchronize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class RecipieController {
@@ -38,6 +41,12 @@ public class RecipieController {
     private void initBinder(WebDataBinder binder) {
         binder.setValidator(recipieValidator);
     }
+
+    private Recipie recipie;
+    private Set<OrderedList> steps;
+    private OrderedList oList;
+    private NutritionInformation nInfo;
+    private User user;
 
     @PostMapping(value = "v1/recipie")
     public ResponseEntity<?> createRecipie(@RequestHeader("Authorization") String token, @Valid @RequestBody Recipie recipie, BindingResult errors,
@@ -146,4 +155,22 @@ public class RecipieController {
         byte[] authKeys = Base64.getDecoder().decode(basicAuthToken[1]);
         return new String(authKeys, "utf-8").split(":");
     }
+
+    @GetMapping(value = "/livenessCheck")
+    @Cacheable(value = "liveness", sync = true)
+    public Recipie createCache() throws Exception {
+
+        List<String> ingredients = Arrays.asList(new String[]{"1", "abc", "some"});
+        this.steps = new HashSet<>();
+        this.oList = new OrderedList(1,"first");
+        steps.add(oList);
+        this.nInfo = new NutritionInformation(Integer.valueOf(2),Float.valueOf(1),Integer.valueOf(3),Float.valueOf(4),Float.valueOf(5));
+        this.recipie = new Recipie(new Date(),new Date(),15,5,20,"samosa","indian",1,ingredients,steps,nInfo);
+        recipie.setRecipeId("StringID246");
+        this.user = new User("StringID246","ravi","kiran","kiranhun@gmail.com","WonderFul@28",new Date(),new Date());
+
+        return recipie;
+
+    }
+
 }

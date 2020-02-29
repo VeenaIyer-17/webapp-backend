@@ -2,6 +2,7 @@ package com.allstars.recipie_management_system.config;
 
 import com.allstars.recipie_management_system.entity.Recipie;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.ClientOptions;
@@ -13,10 +14,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -28,6 +31,7 @@ import org.springframework.data.redis.serializer.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 
+@JsonIgnoreProperties
 @Configuration
 @EnableCaching
 public class RedisCacheConfig extends CachingConfigurerSupport implements CachingConfigurer {
@@ -61,6 +65,8 @@ public class RedisCacheConfig extends CachingConfigurerSupport implements Cachin
                 .commandTimeout(Duration.ofSeconds(redisTimeoutInSecs)).clientOptions(clientOptions).build();
         RedisSentinelConfiguration serverConfig = new RedisSentinelConfiguration().master("mymaster").sentinel( redisHost, 26379);
         serverConfig.setPassword(RedisPassword.of(password));
+//        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration( redisHost, 6379);
+//        serverConfig.setPassword(RedisPassword.of(password));
 
         final LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(serverConfig, clientConfig);
         lettuceConnectionFactory.setValidateConnection(true);
@@ -113,9 +119,9 @@ public class RedisCacheConfig extends CachingConfigurerSupport implements Cachin
         return customJackson2JsonRedisSerializer;
     }
 
-    public @Bean RedisSentinelConfiguration sentinelConfig() {
-       RedisSentinelConfiguration redisSentinelConfiguration = new RedisSentinelConfiguration().master("mymaster").sentinel( redisHost, 26379);
-        redisSentinelConfiguration.setPassword(RedisPassword.of(password));
-       return redisSentinelConfiguration;
+    @Override
+    public CacheErrorHandler errorHandler() {
+        return new RedisCacheErrorHandler();
     }
+
 }
