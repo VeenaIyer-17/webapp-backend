@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProp    /erties(value={"user"}, allowSetters= true)
+@JsonIgnoreProperties(value={"user"}, allowSetters= true)
 
 public class Recipie {
 
