@@ -10,8 +10,8 @@ import com.allstars.recipie_management_system.errors.RecipieCreationStatus;
 import com.allstars.recipie_management_system.service.RecipieService;
 import com.allstars.recipie_management_system.validators.RecipieValidator;
 import org.hibernate.annotations.Synchronize;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -54,7 +54,7 @@ public class RecipieController {
     private NutritionInformation nInfo;
     private User user;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LogManager.getLogger(this.getClass());
 
     @PostMapping(value = "v1/recipie")
     public ResponseEntity<?> createRecipie(@RequestHeader("Authorization") String token, @Valid @RequestBody Recipie recipie, BindingResult errors,

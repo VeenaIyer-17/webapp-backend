@@ -5,8 +5,8 @@ import com.allstars.recipie_management_system.entity.User;
 import com.allstars.recipie_management_system.errors.RegistrationStatus;
 import com.allstars.recipie_management_system.service.UserService;
 import com.allstars.recipie_management_system.validators.UserValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ public class UserController {
     @Autowired
     private UserValidator userValidator;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LogManager.getLogger(this.getClass());
 
     @InitBinder
     private void initBinder(WebDataBinder binder) {
