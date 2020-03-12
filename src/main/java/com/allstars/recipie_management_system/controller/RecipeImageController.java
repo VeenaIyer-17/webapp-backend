@@ -7,8 +7,9 @@ import com.allstars.recipie_management_system.entity.Recipie;
 import com.allstars.recipie_management_system.service.RecipeImageService;
 import com.allstars.recipie_management_system.service.RecipieService;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,16 +42,18 @@ public class RecipeImageController {
     @Autowired
     RecipeImageDao recipeImageDao;
 
+    @Autowired
+    MeterRegistry registry;
 
-    private final Logger logger = LogManager.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 
-    //private final static Logger logger = LoggerFactory.getLogger(RecipeImageController.class);
+    private final static Logger logger = LoggerFactory.getLogger(RecipeImageController.class);
 
     @RequestMapping(method = RequestMethod.POST, value = "image")
     public ResponseEntity<?> addRecipeImage(@PathVariable String idRecipe, @RequestParam MultipartFile image, HttpServletRequest request,@RequestHeader("Authorization") String token) throws Exception {
-
-        logger.info("Inside post /recipe/id/ mapping");
+        registry.counter("custom.metrics.counter", "ApiCall", "ImagePost").increment();
+        log.info("Inside post /recipe/id/ mapping");
 
         long startTime = System.currentTimeMillis();
         if (!recipeImageService.isImagePresent(image)) {
@@ -104,8 +107,8 @@ public class RecipeImageController {
 
     @DeleteMapping("/image/{idImage}")
     public ResponseEntity<?> deleteRecipeImage(@PathVariable String idRecipe, @PathVariable String idImage,@RequestHeader("Authorization") String token) throws Exception {
-
-        logger.info("Inside delete /recipe/image/id mapping");
+        registry.counter("custom.metrics.counter", "ApiCall", "ImageDelete").increment();
+        log.info("Inside delete /recipe/image/id mapping");
         long startTime = System.currentTimeMillis();
         String userDetails[] = decryptAuthenticationToken(token);
 
@@ -156,8 +159,8 @@ public class RecipeImageController {
 
     @GetMapping("/image/{idImage}")
     public ResponseEntity<?> getImage(@PathVariable String idRecipe, @PathVariable String idImage) throws Exception {
-
-        logger.info("Inside get /recipe/id/image/id mapping");
+        registry.counter("custom.metrics.counter", "ApiCall", "ImageGet").increment();
+        log.info("Inside get /recipe/id/image/id mapping");
         long startTime = System.currentTimeMillis();
         Recipie recipie = recipieDao.findByRecipeid(idRecipe);
         if (recipie != null) {
