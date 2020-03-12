@@ -9,11 +9,11 @@ import com.allstars.recipie_management_system.entity.User;
 import com.allstars.recipie_management_system.errors.RecipieCreationStatus;
 import com.allstars.recipie_management_system.service.RecipieService;
 import com.allstars.recipie_management_system.validators.RecipieValidator;
-import org.hibernate.annotations.Synchronize;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -37,6 +37,10 @@ public class RecipieController {
     @Autowired
     private Userdao userdao;
 
+    @Autowired
+    MeterRegistry registry;
+
+
     @InitBinder
     private void initBinder(WebDataBinder binder) {
         binder.setValidator(recipieValidator);
@@ -48,9 +52,14 @@ public class RecipieController {
     private NutritionInformation nInfo;
     private User user;
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
     @PostMapping(value = "v1/recipie")
     public ResponseEntity<?> createRecipie(@RequestHeader("Authorization") String token, @Valid @RequestBody Recipie recipie, BindingResult errors,
                                            HttpServletResponse response) throws Exception {
+        registry.counter("custom.metrics.counter", "ApiCall", "RecipePost").increment();
+        log.info("Inside post /recipe mapping");
+
         RecipieCreationStatus recipieCreationStatus;
 
         if (errors.hasErrors()) {
@@ -67,8 +76,9 @@ public class RecipieController {
 
     @GetMapping(value = "v1/recipie/{id}")
     public ResponseEntity<Recipie> getRecipe(@PathVariable("id") String id) {
-        //System.out.println(recipeId);
-        //UUID recipeId = UUID.fromString(id);
+        registry.counter("custom.metrics.counter", "ApiCall", "ReipeGet").increment();
+        log.info("Inside get /recipe mapping");
+
         Recipie recipe = recipieService.getRecipe(id);
         if (null != recipe) {
             return new ResponseEntity<Recipie>(recipe, HttpStatus.OK);
@@ -78,6 +88,8 @@ public class RecipieController {
 
     @DeleteMapping(value = "/v1/recipie/{id}")
     public ResponseEntity deleteRecipe(@PathVariable("id") String recipeId, @RequestHeader("Authorization") String token) throws UnsupportedEncodingException {
+        registry.counter("custom.metrics.counter", "ApiCall", "RecipeDelete").increment();
+        log.info("Inside delete /recipe mapping");
         String userDetails[] = decryptAuthenticationToken(token);
         Recipie existingRecipie = recipieService.getRecipe(recipeId);
         if (null != existingRecipie) {
@@ -93,7 +105,8 @@ public class RecipieController {
     @PutMapping(value = "v1/recipie/{recipieid}")
     public ResponseEntity<?> updateRecipie(@PathVariable("recipieid") String id, @RequestHeader("Authorization") String token, @Valid @RequestBody Recipie recipie, BindingResult errors,
                                            HttpServletResponse response) throws UnsupportedEncodingException {
-
+        registry.counter("custom.metrics.counter", "ApiCall", "RecipePut").increment();
+        log.info("Inside Update /recipe mapping");
         RecipieCreationStatus recipieCreationStatus;
         Recipie existingRecipe = recipieService.getRecipe(id);
         if (errors.hasErrors()) {
@@ -117,12 +130,15 @@ public class RecipieController {
 
     @GetMapping(value = "/v1/recipies")
     public ResponseEntity<?> getLatestRecipe() {
+        registry.counter("custom.metrics.counter", "ApiCall", "RecipeLatest").increment();
+        log.info("Inside get /recipes mapping");
         long startTime = System.currentTimeMillis();
         Recipie recipe = null;
         if (recipieService.getLatestRecipie() != null) {
             recipe = recipieService.getLatestRecipie();
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime);
+            log.info("Inside get Latest /recipe mapping");
             return new ResponseEntity<Recipie>(recipe, HttpStatus.OK);
         }
         long endTime = System.currentTimeMillis();
@@ -135,11 +151,13 @@ public class RecipieController {
         for (Recipie recipie : recipieService.getAllRecipes()) {
             recipieList.add(recipie);
         }
+        log.info("Inside get all /recipe mapping");
         return recipieList;
     }
 
     @GetMapping(value = "/v1/allrecipes")
     public ResponseEntity<Object> getAllRecipes() {
+        registry.counter("custom.metrics.counter", "ApiCall", "GetAllRecipes").increment();
         return ResponseEntity.ok(retrieveAllRecipes());
     }
 
