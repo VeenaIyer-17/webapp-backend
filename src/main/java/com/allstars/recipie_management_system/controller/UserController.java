@@ -5,6 +5,7 @@ import com.allstars.recipie_management_system.entity.User;
 import com.allstars.recipie_management_system.errors.RegistrationStatus;
 import com.allstars.recipie_management_system.service.UserService;
 import com.allstars.recipie_management_system.validators.UserValidator;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class UserController {
     @Autowired
     private UserValidator userValidator;
 
+    @Autowired
+    MeterRegistry registry;
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @InitBinder
@@ -42,7 +46,7 @@ public class UserController {
     @RequestMapping(value = "v1/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
-
+        registry.counter("custom.metrics.counter", "ApiCall", "UserPost").increment();
         log.info("Inside post /user mapping");
         RegistrationStatus registrationStatus;
 
@@ -62,7 +66,7 @@ public class UserController {
 
     @RequestMapping(value="v1/user/self" ,method = RequestMethod.GET)
     public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token, HttpServletRequest request) throws UnsupportedEncodingException {
-
+        registry.counter("custom.metrics.counter", "ApiCall", "UserGet").increment();
         log.info("Inside get /self mapping");
 
        try {
@@ -83,7 +87,7 @@ public class UserController {
     @RequestMapping(value = "v1/user/self", method = RequestMethod.PUT)
     public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String header, @Valid @RequestBody User user, BindingResult errors,
                                              HttpServletResponse response) throws UnsupportedEncodingException {
-
+        registry.counter("custom.metrics.counter", "ApiCall", "UserPut").increment();
         log.info("Inside put /self mapping");
         try {
             if(header == null){
