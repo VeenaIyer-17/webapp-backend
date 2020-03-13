@@ -87,7 +87,6 @@ public class RecipieService {
     public void deleteRecipe(String recipeId) {
         recipeTimer = registry.timer("custom.metrics.timer", "Backend", "RecipeDELETE");
         recipeTimer.record(() -> recipieDao.deleteById(recipeId));
-
     }
 
     @CachePut(value = "recipe", key = "#existingRecipe.recipeId")
@@ -98,7 +97,11 @@ public class RecipieService {
         updateRecipe.setCreatedts(existingRecipe.getCreatedts());
         updateRecipe.setUpdated_ts();
         updateRecipe.setTotal_time_in_min();
-        return recipieDao.save(updateRecipe);
+
+        recipeTimer = registry.timer("custom.metrics.timer", "Backend", "RecipeUPDATE");
+        final Recipie[] recipeEntities = new Recipie[1];
+        recipeTimer.record(() -> recipeEntities[0] =  recipieDao.save(updateRecipe));
+        return recipeEntities[0];
     }
 
     public ResponseEntity<?> updateRecipie(String id, String userEmailId, Recipie recipie) {
@@ -137,7 +140,10 @@ public class RecipieService {
     }
 
     public List<Recipie> getAllRecipes() {
-        return recipieDao.findAll();
+        recipeTimer = registry.timer("custom.metrics.timer", "Backend", "RecipeLIST");
+        final List<Recipie>[] recipeEntities = new List[1];
+        recipeTimer.record(() -> recipeEntities[0] = recipieDao.findAll());
+        return  recipeEntities[0];
     }
 
     public Optional<Recipie> findById(String idRecipe) {

@@ -47,27 +47,10 @@ public class UserService implements UserDetailsService {
             userTimer.record(()-> users[0] = userDao.save(user));
             return users[0];
 
-//            userTimer.record(()-> {
-//                try {
-//                    TimeUnit.MILLISECONDS.sleep(1500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//
-//            userTimer.record(3000, TimeUnit.MILLISECONDS);
         } catch (Exception e){
             return null;
         }
-        //return  user;
     }
-
-//    public User saveUser(User users) {
-//        userTimer = registry.timer("custom.metrics.timer", "Backend", "UserSAVE");
-//        final User[] user = new User[1];
-//        userTimer.record(()-> user[0] = userDao.save(users));
-//        return user[0];
-//    }
 
 
     public Boolean isEmailPresent(String emailId) {
