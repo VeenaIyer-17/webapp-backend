@@ -5,6 +5,8 @@ import com.allstars.recipie_management_system.dao.Userdao;
 import com.allstars.recipie_management_system.entity.User;
 import com.allstars.recipie_management_system.entity.UserDetailsCustom;
 import com.allstars.recipie_management_system.errors.RegistrationStatus;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.passay.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,7 @@ import org.springframework.validation.FieldError;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -27,16 +30,26 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public User saveUser(User user){
+    @Autowired
+    MeterRegistry registry;
 
+    Timer userTimer;
+
+    public User saveUser(User user){
+        userTimer = registry.timer("custom.metrics.timer", "Backend", "UserSAVE");
         try {
             passwordEncoder = new BCryptPasswordEncoder();
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user = userDao.save(user);
+
+            userTimer = registry.timer("custom.metrics.timer", "Backend", "UserSAVE");
+            final User[] users = new User[1];
+
+            userTimer.record(()-> users[0] = userDao.save(user));
+            return users[0];
+
         } catch (Exception e){
             return null;
         }
-        return  user;
     }
 
 
@@ -49,7 +62,10 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUser(String emailId) {
-        return userDao.findByEmailId(emailId);
+        userTimer = registry.timer("custom.metrics.timer", "Backend", "UserGET");
+        final User[] user = new User[1];
+        userTimer.record(()-> user[0] = userDao.findByEmailId(emailId));
+        return user[0] ;
     }
 
     @Override
