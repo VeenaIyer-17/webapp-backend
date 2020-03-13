@@ -52,6 +52,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
             http.csrf().disable()
                     .authorizeRequests()
                     .antMatchers("/v1/user").permitAll()
+                    .antMatchers(HttpMethod.GET, "/actuator/*").permitAll()
+                    .antMatchers(HttpMethod.GET, "/actuator/*/*").permitAll()
                     .antMatchers(HttpMethod.GET, "/v1/recipies").permitAll()
                     .antMatchers(HttpMethod.GET, "/v1/recipie/{id}").permitAll()
                     .antMatchers(HttpMethod.GET, "/v1/allrecipes").permitAll()
