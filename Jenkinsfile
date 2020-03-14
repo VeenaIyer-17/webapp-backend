@@ -50,7 +50,7 @@ node{
 }
 
 def nextVersionFromGit(scope) {
-	def latestVersion = sh returnStdout: true, script: 'yq read ../helm-charts/helm-backend/Chart.yaml version'
+	def latestVersion = sh returnStdout: true, script: 'yq read helm-charts/helm-backend/Chart.yaml version'
 	def (major, minor, patch) = latestVersion.tokenize('.').collect { it.toInteger() }
 	def nextVersion
 	switch (scope) {
