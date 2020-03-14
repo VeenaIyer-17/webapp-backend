@@ -7,7 +7,7 @@ node{
 
 	stage('Git Clone') {
 		checkout scm
-			dir('../helm-charts'){
+			dir('helm-charts'){
 			   git branch: "${env.git_branch}" , credentialsId: 'github-credentials' , url: "${env.HELM_URL}"
 			 }
 	}
@@ -40,8 +40,8 @@ node{
 			def scope = "${env.increment_type}"
 			version = nextVersionFromGit(scope)
 			
-			sh "yq write -i ../helm-charts/helm-backend/Chart.yaml version ${version}"
-			sh "yq write -i ../helm-charts/helm-backend/values.yaml backend_image ${DOCKER_USER}/webapp-backend:$commit_id"
+			sh "yq write -i helm-charts/helm-backend/Chart.yaml version ${version}"
+			sh "yq write -i helm-charts/helm-backend/values.yaml backend_image ${DOCKER_USER}/webapp-backend:$commit_id"
 			pushToGit("${env.git_branch}")
 			
 	}
