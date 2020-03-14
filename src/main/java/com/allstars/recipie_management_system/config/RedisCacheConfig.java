@@ -63,10 +63,10 @@ public class RedisCacheConfig extends CachingConfigurerSupport implements Cachin
 
         LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
                 .commandTimeout(Duration.ofSeconds(redisTimeoutInSecs)).clientOptions(clientOptions).build();
-        RedisSentinelConfiguration serverConfig = new RedisSentinelConfiguration().master("mymaster").sentinel( redisHost, 26379);
-        serverConfig.setPassword(RedisPassword.of(password));
-//        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration( redisHost, 6379);
+//        RedisSentinelConfiguration serverConfig = new RedisSentinelConfiguration().master("mymaster").sentinel( redisHost, 26379);
 //        serverConfig.setPassword(RedisPassword.of(password));
+        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration( redisHost, 6379);
+        serverConfig.setPassword(RedisPassword.of(password));
 
         final LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(serverConfig, clientConfig);
         lettuceConnectionFactory.setValidateConnection(true);
