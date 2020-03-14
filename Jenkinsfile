@@ -70,8 +70,7 @@ def nextVersionFromGit(scope) {
 
 def pushToGit(branch) {
 	def git_branch =  branch
-		dir("../helm-charts"){
-		sh "cd ../helm-charts"
+		dir("helm-charts"){
 		sh "git config --global user.name ${DOCKER_USER}"
 		sh	"sudo git commit -am 'version upgrade to ${version} by jenkins'"
 		sh	"git push origin ${git_branch}"
