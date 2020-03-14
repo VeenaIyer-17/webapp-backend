@@ -5,6 +5,9 @@ import com.allstars.recipie_management_system.entity.User;
 import com.allstars.recipie_management_system.errors.RegistrationStatus;
 import com.allstars.recipie_management_system.service.UserService;
 import com.allstars.recipie_management_system.validators.UserValidator;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,11 @@ public class UserController {
     @Autowired
     private UserValidator userValidator;
 
+    @Autowired
+    MeterRegistry registry;
+
+    private final Logger log = LogManager.getLogger(this.getClass());
+
     @InitBinder
     private void initBinder(WebDataBinder binder) {
         binder.setValidator(userValidator);
@@ -38,6 +46,8 @@ public class UserController {
     @RequestMapping(value = "v1/user", method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult errors,
                                         HttpServletResponse response) throws Exception {
+        registry.counter("custom.metrics.counter", "ApiCall", "UserPost").increment();
+        log.info("Inside post /user mapping");
         RegistrationStatus registrationStatus;
 
         if(errors.hasErrors()) {
@@ -56,6 +66,9 @@ public class UserController {
 
     @RequestMapping(value="v1/user/self" ,method = RequestMethod.GET)
     public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token, HttpServletRequest request) throws UnsupportedEncodingException {
+        registry.counter("custom.metrics.counter", "ApiCall", "UserGet").increment();
+        log.info("Inside get /self mapping");
+
        try {
            if(token == null){
                return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -74,6 +87,8 @@ public class UserController {
     @RequestMapping(value = "v1/user/self", method = RequestMethod.PUT)
     public ResponseEntity<String> updateUser(@RequestHeader("Authorization") String header, @Valid @RequestBody User user, BindingResult errors,
                                              HttpServletResponse response) throws UnsupportedEncodingException {
+        registry.counter("custom.metrics.counter", "ApiCall", "UserPut").increment();
+        log.info("Inside put /self mapping");
         try {
             if(header == null){
                 return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

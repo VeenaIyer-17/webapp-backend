@@ -7,8 +7,10 @@ import com.allstars.recipie_management_system.entity.Recipie;
 import com.allstars.recipie_management_system.service.RecipeImageService;
 import com.allstars.recipie_management_system.service.RecipieService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +28,11 @@ import java.util.UUID;
 @RequestMapping("/v1/recipie/{idRecipe}/*")
 public class RecipeImageController {
 
-
     @Autowired
     private RecipieService recipieService;
 
-
     @Autowired
     private RecipeImageService recipeImageService;
-
 
     @Autowired
     RecipieDao recipieDao;
@@ -41,11 +40,19 @@ public class RecipeImageController {
     @Autowired
     RecipeImageDao recipeImageDao;
 
-    private final static Logger logger = LoggerFactory.getLogger(RecipeImageController.class);
+    @Autowired
+    MeterRegistry registry;
+
+    Timer imageTimer;
+
+    private final Logger log = LogManager.getLogger(this.getClass());
+
+    private final static Logger logger = LogManager.getLogger(RecipeImageController.class);
 
     @RequestMapping(method = RequestMethod.POST, value = "image")
     public ResponseEntity<?> addRecipeImage(@PathVariable String idRecipe, @RequestParam MultipartFile image, HttpServletRequest request,@RequestHeader("Authorization") String token) throws Exception {
-
+        registry.counter("custom.metrics.counter", "ApiCall", "ImagePost").increment();
+        log.info("Inside post /recipe/id/ mapping");
 
         long startTime = System.currentTimeMillis();
         if (!recipeImageService.isImagePresent(image)) {
@@ -99,6 +106,9 @@ public class RecipeImageController {
 
     @DeleteMapping("/image/{idImage}")
     public ResponseEntity<?> deleteRecipeImage(@PathVariable String idRecipe, @PathVariable String idImage,@RequestHeader("Authorization") String token) throws Exception {
+        registry.counter("custom.metrics.counter", "ApiCall", "ImageDelete").increment();
+        imageTimer = registry.timer("custom.metrics.timer", "Backend", "ImageDELETE");
+        log.info("Inside delete /recipe/image/id mapping");
         long startTime = System.currentTimeMillis();
         String userDetails[] = decryptAuthenticationToken(token);
 
@@ -116,7 +126,9 @@ public class RecipeImageController {
                             if (recipeImage != null) {
                                 recipeImageService.deleteImage(recipeImage,recipie.getRecipeId());
                                 recipie.setImage(null);
-                                recipeImageDao.delete(recipeImage);
+
+                                imageTimer.record(() -> recipeImageDao.delete(recipeImage));
+
                                 recipieService.updateRecipe(recipie,recipie);
                                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
                             }
@@ -149,18 +161,25 @@ public class RecipeImageController {
 
     @GetMapping("/image/{idImage}")
     public ResponseEntity<?> getImage(@PathVariable String idRecipe, @PathVariable String idImage) throws Exception {
+        registry.counter("custom.metrics.counter", "ApiCall", "ImageGet").increment();
+        log.info("Inside get /recipe/id/image/id mapping");
         long startTime = System.currentTimeMillis();
         Recipie recipie = recipieDao.findByRecipeid(idRecipe);
         if (recipie != null) {
-            RecipeImage recipeImage = recipeImageDao.findByImageId(idImage);
-            if (recipeImage == null) {
+            imageTimer = registry.timer("custom.metrics.timer", "Backend", "ImageGET");
+            final RecipeImage[] imageEntities = new RecipeImage[1];
+            imageTimer.record(() -> imageEntities[0] =  recipeImageDao.findByImageId(idImage));
+            //return imageEntities[0];
+
+            //RecipeImage recipeImage = recipeImageDao.findByImageId(idImage);
+            if (imageEntities[0] == null) {
                 logger.error("Get image failed. Recipe not found");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("");
             }
             else {
-                if (recipie.getImage().getImageId().equals(recipeImage.getImageId())){
+                if (recipie.getImage().getImageId().equals(imageEntities[0].getImageId())){
                     logger.info("Image get successful");
-                    return ResponseEntity.status(HttpStatus.OK).body(recipeImage);
+                    return ResponseEntity.status(HttpStatus.OK).body(imageEntities[0]);
                 }
                 else{
                     logger.error("The image specified does not exist for this recipie");

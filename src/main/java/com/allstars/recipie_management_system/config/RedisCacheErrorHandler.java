@@ -2,14 +2,14 @@ package com.allstars.recipie_management_system.config;
 
 import io.lettuce.core.RedisCommandTimeoutException;
 import net.bytebuddy.implementation.bytecode.Throw;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 
 public class RedisCacheErrorHandler implements CacheErrorHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(RedisCacheErrorHandler.class);
+    private static final Logger log = LogManager.getLogger(RedisCacheErrorHandler.class);
 
 
     @Override
