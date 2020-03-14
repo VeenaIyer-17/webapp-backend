@@ -14,7 +14,9 @@ node{
 
 	stage('Build package') {
 
-            sh ' mvn clean install'
+            sh ''' mvn clean
+		   mvn package 
+		'''
     }
 
     stage('Build docker image') {
@@ -39,7 +41,7 @@ node{
 			version = nextVersionFromGit(scope)
 			
 			sh "yq write -i ../helm-charts/helm-backend/Chart.yaml version ${version}"
-			sh "yq write -i ../helm-charts/helm-backend/values.yaml backend_image ${DOCKER_USER}/backend:$commit_id"
+			sh "yq write -i ../helm-charts/helm-backend/values.yaml backend_image ${DOCKER_USER}/webapp-backend:$commit_id"
 			pushToGit("${env.git_branch}")
 			
 	}
