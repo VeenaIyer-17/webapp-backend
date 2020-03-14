@@ -14,7 +14,9 @@ node{
 
 	stage('Build package') {
 
-            sh ' mvn clean install'
+            sh ''' mvn clean
+		   mvn package 
+		'''
     }
 
     stage('Build docker image') {
