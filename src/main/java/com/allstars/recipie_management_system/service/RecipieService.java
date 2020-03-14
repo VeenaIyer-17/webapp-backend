@@ -143,7 +143,7 @@ public class RecipieService {
         recipeTimer = registry.timer("custom.metrics.timer", "Backend", "RecipeLIST");
         final List<Recipie>[] recipeEntities = new List[1];
         recipeTimer.record(() -> recipeEntities[0] = recipieDao.findAll());
-        return  recipeEntities[0];
+        return  recipieDao.findAll();
     }
 
     public Optional<Recipie> findById(String idRecipe) {

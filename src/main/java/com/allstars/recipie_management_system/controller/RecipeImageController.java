@@ -9,8 +9,8 @@ import com.allstars.recipie_management_system.service.RecipieService;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +28,11 @@ import java.util.UUID;
 @RequestMapping("/v1/recipie/{idRecipe}/*")
 public class RecipeImageController {
 
-
     @Autowired
     private RecipieService recipieService;
 
-
     @Autowired
     private RecipeImageService recipeImageService;
-
 
     @Autowired
     RecipieDao recipieDao;
@@ -48,10 +45,9 @@ public class RecipeImageController {
 
     Timer imageTimer;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LogManager.getLogger(this.getClass());
 
-
-    private final static Logger logger = LoggerFactory.getLogger(RecipeImageController.class);
+    private final static Logger logger = LogManager.getLogger(RecipeImageController.class);
 
     @RequestMapping(method = RequestMethod.POST, value = "image")
     public ResponseEntity<?> addRecipeImage(@PathVariable String idRecipe, @RequestParam MultipartFile image, HttpServletRequest request,@RequestHeader("Authorization") String token) throws Exception {

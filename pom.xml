@@ -60,7 +60,7 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>log4j-over-slf4j</artifactId>
-                    <groupId>org.slf4j</groupId>
+                    <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
             </exclusions>
 
