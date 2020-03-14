@@ -10,8 +10,8 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +25,7 @@ import java.net.URL;
 public class RecipeImageAwsService implements RecipeImageService {
 
 
-    private final static Logger logger = LoggerFactory.getLogger(RecipeImageService.class);
+    private final static Logger logger = LogManager.getLogger(RecipeImageService.class);
 
     private AmazonS3 s3client;
 

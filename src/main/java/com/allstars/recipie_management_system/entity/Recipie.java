@@ -10,6 +10,7 @@ import java.util.Set;
 
 @Entity
 @JsonIgnoreProperties(value={"user"}, allowSetters= true)
+
 public class Recipie {
 
     @GeneratedValue(generator = "uuid")
